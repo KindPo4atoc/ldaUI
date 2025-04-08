@@ -1,0 +1,293 @@
+/* Стили для блока "О странице" */
+.about-page {
+    padding: 60px 0;
+    background: linear-gradient(
+        45deg, 
+        rgba(110, 69, 226, 0.1), 
+        rgba(136, 211, 206, 0.1)
+    );
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.about-page h2 {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 30px;
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.about-page h2::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+}
+
+.about-page p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 20px 0;
+    text-align: justify;
+}
+.about-page ul {
+    margin: 25px 0;
+    padding-left: 30px;
+}
+
+.about-page li {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 15px 0;
+    padding-left: 30px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.about-page li:hover {
+    color: var(--accent);
+    transform: translateX(10px);
+}
+
+.about-page li::before {
+    content: "➤";
+    position: absolute;
+    left: 0;
+    top:55%;
+    transform: translateY(-50%) scale(0.9);
+    color: var(--secondary);
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    vertical-align: middle;
+    line-height: 1;
+}
+
+.about-page li:hover::before {
+    transform: translateY(-50%) scale(1.1);
+    color: var(--primary);
+}
+
+.about-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(136, 211, 206, 0.2);
+}
+
+.about-card::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -30%;
+    width: 160%;
+    height: 200%;
+    background: radial-gradient(
+        circle at center, 
+        rgba(110, 69, 226, 0.1) 0%, 
+        transparent 70%
+    );
+    z-index: -1;
+}
+
+.about-icon {
+    font-size: 64px;
+    text-align: center;
+    margin-bottom: 25px;
+    animation: float 4s ease-in-out infinite;
+}
+
+.about-content ul {
+    margin: 20px 0;
+    padding-left: 30px;
+}
+
+.about-content li {
+    margin: 15px 0;
+    position: relative;
+    padding-left: 25px;
+}
+
+.about-content li::before {
+    color: var(--accent);
+    position: absolute;
+    left: 0;
+    font-size: 24px;
+}
+
+.tech-stack {
+    margin: 30px 0;
+    padding: 25px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+}
+.tech-stack h3 {
+    font-size: 1.4rem;
+    color: var(--accent);
+    margin-bottom: 20px;
+    border-left: 4px solid var(--primary);
+    padding-left: 15px;
+}
+.tech-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+.disclaimer p {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.6;
+    text-align: center;
+}
+.tech-item {
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.tech-item:hover {
+    transform: translateY(-3px);
+    background: linear-gradient(
+        45deg, 
+        var(--primary), 
+        var(--secondary)
+    );
+}
+
+.disclaimer {
+    margin-top: 25px;
+    padding-top: 25px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+    opacity: 0.8;
+}
+
+.disclaimer a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--accent);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .about-card {
+        padding: 25px;
+    }
+    
+    .tech-items {
+        grid-template-columns: 1fr;
+    }
+    .about-page h2 {
+        font-size: 2rem;
+        padding-bottom: 10px;
+    }
+    
+    .about-page p {
+        font-size: 1rem;
+        text-align: left;
+    }
+    
+    .about-page li {
+        font-size: 0.95rem;
+        padding-left: 20px;
+    }
+    
+    .tech-stack h3 {
+        font-size: 1.2rem;
+    }
+}
+.description-block {
+    margin-bottom: 30px;
+    padding: 25px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 15px;
+    border-left: 4px solid var(--primary);
+}
+
+.description-block p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    padding-top: 1.1%;
+    color: rgba(255, 255, 255, 0.85);
+    text-align: justify;
+}
+.visualization-block {
+    padding: 20px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 15px;
+}
+
+.text-explanation {
+    margin-bottom: 25px;
+}
+
+.text-explanation p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.85);
+}
+
+.text-explanation ul {
+    margin: 15px 0;
+    padding-left: 25px;
+    list-style: none;
+}
+
+.text-explanation li {
+    margin: 12px 0;
+    padding-left: 20px;
+    position: relative;
+}
+
+.text-explanation li::before {
+    content: "•";
+    color: var(--accent);
+    position: absolute;
+    left: 0;
+    font-size: 1.4rem;
+    line-height: 1;
+}
+
+/* Адаптивная верстка */
+@media (max-width: 768px) {
+    .description-block,
+    .visualization-block {
+        width: 100%;
+        margin: 15px 0;
+    }
+    
+    .text-explanation p {
+        font-size: 1rem;
+    }
+}
+
+/* Стили для математической визуализации */
+.matrix-box {
+    padding: 20px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    font-family: monospace;
+}
+
+.mean-value {
+    display: block;
+    margin: 15px 0;
+    padding: 10px;
+    background: rgba(110,69,226,0.1);
+    border-radius: 8px;
+    color: var(--accent);
+}

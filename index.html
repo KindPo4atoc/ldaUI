@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoanAI - Linear Discriminant Analysis Explorer</title>
+    <link rel="stylesheet" href="css/styleIndex.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon"></div>
+                    <div class="logo-text">LoanAI</div>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#">Главная</a></li>
+                        <li><a href="aboutLDA.html">О LDA</a></li>
+                        <li><a href="#">Демо</a></li>
+                        <li><a href="#">Гайды</a></li>
+                        <li><a href="#">О нас</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Раскрой скрытые закономерности с Linear Discriminant Analysis</h1>
+                    <p>LoanAI делает машинное обучение доступным и визуально впечатляющим. Исследуйте мощь LDA через интерактивные демонстрации и наглядные примеры.</p>
+                    <a href="#" class="cta-button">Попробовать демо</a>
+                </div>
+                <div class="hero-visualization floating">
+                    <div class="lda-graph">
+                        <div class="axis x-axis"></div>
+                        <div class="axis y-axis"></div>
+                        <div class="discriminant-line"></div>
+                        <!-- Data points will be added by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">Почему LDA?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Уменьшение размерности</h3>
+                    <p>LDA помогает сократить количество признаков, сохраняя при этом максимальную разделимость классов, что особенно полезно для визуализации многомерных данных.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Классификация</h3>
+                    <p>Используйте LDA как мощный классификатор, который находит оптимальные границы между классами в ваших данных.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Наглядность</h3>
+                    <p>Преобразуйте сложные многомерные данные в понятные 2D или 3D визуализации, сохраняя структуру классов.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="process">
+        <div class="container">
+            <h2 class="section-title">Как работает LDA?</h2>
+            <div class="process-container">
+                <!-- Шаг 1 -->
+                <div class="process-step">
+                    <div class="step-number">1</div>
+                    <h3>Анализ распределения данных</h3>
+                    <div class="step-visual">
+                        <div class="scatter-plot">
+                            <div class="scatter-point class-1" style="left: 20%; top: 30%"></div>
+                            <div class="scatter-point class-2" style="left: 70%; top: 60%"></div>
+                            <div class="scatter-point class-1" style="left: 30%; top: 40%"></div>
+                            <div class="scatter-point class-2" style="left: 80%; top: 50%"></div>
+                        </div>
+                    </div>
+                    <p>Алгоритм анализирует распределение классов в многомерном пространстве</p>
+                </div>
+
+                <!-- Шаг 2 -->
+                <div class="process-step">
+                    <div class="step-number">2</div>
+                    <h3>Вычисление матриц</h3>
+                    <div class="step-visual">
+                        <div class="matrix-grid">
+                            <div class="matrix-cell"></div>
+                            <div class="matrix-cell"></div>
+                            <div class="matrix-cell"></div>
+                            <div class="matrix-cell"></div>
+                            <div class="matrix-cell"></div>
+                            <div class="matrix-cell"></div>
+                            <div class="matrix-cell"></div>
+                            <div class="matrix-cell"></div>
+                            <div class="matrix-cell"></div>
+                        </div>
+                    </div>
+                    <p>Расчёт внутриклассовой и межклассовой матриц рассеяния</p>
+                </div>
+
+                <!-- Шаг 3 -->
+                <div class="process-step">
+                    <div class="step-number">3</div>
+                    <h3>Проецирование данных</h3>
+                    <div class="step-visual">
+                        <div class="scatter-plot">
+                            <div class="lda-projection"></div>
+                            <div class="scatter-point class-1" style="left: 30%; top: 45%"></div>
+                            <div class="scatter-point class-2" style="left: 70%; top: 55%"></div>
+                        </div>
+                    </div>
+                    <p>Нахождение оптимальной проекции для максимизации разделимости классов</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <footer>
+        <div class="container">
+            <div class="footer-logo">LoanAI</div>
+            <div class="footer-slogan">Linear Discriminant Analysis — но с человеческим лицом!</div>
+            <div class="social-links">
+                <a href="#" class="social-link">📘</a>
+                <a href="#" class="social-link">🐦</a>
+                <a href="#" class="social-link">📸</a>
+                <a href="#" class="social-link">💻</a>
+            </div>
+            <div class="copyright">© 2023 LoanAI. Все права защищены.</div>
+        </div>
+    </footer>
+    
+    <script src="js/scriptsIndex.js"></script>
+</body>
+</html>
