@@ -16,9 +16,9 @@
                 </div>
                 <nav>
                     <ul>
-                        <li><a href="#">Главная</a></li>
+                        <li><a href="index.html">Главная</a></li>
                         <li><a href="aboutLDA.html">О LDA</a></li>
-                        <li><a href="#">Демо</a></li>
+                        <li><a href="demo.html">Демо</a></li>
                         <li><a href="#">Гайды</a></li>
                         <li><a href="#">О нас</a></li>
                     </ul>
@@ -220,73 +220,5 @@
     </footer>
 
     <script src="js/scriptsIndex.js"></script>
-    <script>
-        // Генерация случайных данных
-        let currentData = [];
-        
-        function generateData() {
-            const container = document.getElementById('originalData');
-            container.innerHTML = '';
-            
-            // Генерация 20 точек двух классов
-            for(let i = 0; i < 10; i++) {
-                currentData.push({
-                    x: Math.random() * 0.4 + 0.1,
-                    y: Math.random() * 0.4 + 0.1,
-                    class: 0
-                });
-                currentData.push({
-                    x: Math.random() * 0.4 + 0.5,
-                    y: Math.random() * 0.4 + 0.5,
-                    class: 1
-                });
-            }
-            
-            renderData('originalData', currentData);
-            updateHyperplane();
-        }
-
-        // Отрисовка точек
-        function renderData(containerId, data) {
-            const container = document.getElementById(containerId);
-            data.forEach(point => {
-                const dot = document.createElement('div');
-                dot.className = `data-dot class-${point.class}`;
-                dot.style.left = `${point.x * 100}%`;
-                dot.style.top = `${point.y * 100}%`;
-                container.appendChild(dot);
-            });
-        }
-
-        // Обновление гиперплоскости
-        function updateHyperplane() {
-            const angle = document.getElementById('angleSlider').value;
-            document.querySelector('.hyperplane').style.transform = `rotate(${angle}deg)`;
-        }
-
-        // Классификация точки
-        function classifyPoint() {
-            const x = parseFloat(document.getElementById('pointX').value);
-            const y = parseFloat(document.getElementById('pointY').value);
-            
-            // Простая логика классификации (для демонстрации)
-            const angle = document.getElementById('angleSlider').value * Math.PI / 180;
-            const result = y - Math.tan(angle) * x > 0 ? 1 : 0;
-            
-            const vis = document.getElementById('classificationVis');
-            vis.innerHTML = '';
-            
-            // Отрисовка точки
-            const dot = document.createElement('div');
-            dot.className = `data-dot class-${result} pulse`;
-            dot.style.left = `${x * 100}%`;
-            dot.style.top = `${y * 100}%`;
-            vis.appendChild(dot);
-        }
-
-        // Инициализация
-        generateData();
-        document.getElementById('angleSlider').addEventListener('input', updateHyperplane);
-    </script>
 </body>
 </html>

@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoanAI Демо | Кредитный анализ</title>
+    <link rel="stylesheet" href="css/styleIndex.css">
+    <link rel="stylesheet" href="css/styleAbout.css">
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.17/vue.min.js'></script>
+        <script  src = 'https://cdn.jsdelivr.net/npm/chart.js'> </script>
+    <style>
+        /* Дополнительные стили для демо-страницы */
+        .demo-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 20px;
+        }
+        
+        .credit-demo-block {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(136, 211, 206, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        
+        .credit-demo-block h1 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            background: linear-gradient(to right, #6e45e2, #88d3ce);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .credit-demo-content {
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+        
+        .credit-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+        
+        .feature-cards {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-cards:hover {
+            transform: translateY(-5px);
+            background: rgba(110, 69, 226, 0.15);
+        }
+        
+        .feature-cards h3 {
+            color: #88d3ce;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .credit-demo-block {
+                padding: 30px 20px;
+            }
+            
+            .credit-demo-block h1 {
+                font-size: 2rem;
+            }
+        }
+        /* Стили для секции с датасетом */
+        .dataset-section {
+            margin: 40px 5%;
+            padding: 30px 0;
+            border-top: 1px solid rgba(136, 211, 206, 0.2);
+        }
+
+        .dataset-card {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .schema-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .schema-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .schema-item {
+            padding: 20px;
+            border-radius: 12px;
+            background: rgba(110, 69, 226, 0.08);
+            border: 1px solid rgba(136, 211, 206, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .schema-item:hover {
+            transform: translateY(-5px);
+            background: linear-gradient(
+                45deg,
+                rgba(110, 69, 226, 0.1),
+                rgba(136, 211, 206, 0.05)
+            );
+        }
+
+        .column-name {
+            display: block;
+            color: #88d3ce;
+            font-family: monospace;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .column-type {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .data-source {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .data-source h3 {
+            color: #b8f2e6;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .dataset-card {
+                padding: 25px;
+            }
+            
+            .schema-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        .table-container {
+            max-height: 500px; /* Фиксированная высота */
+            overflow: auto;
+            position: relative;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            margin: 20px 2.5%;
+        }
+
+        /* Скрываем скроллбар */
+        .table-container::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            background: transparent;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: rgba(255, 255, 255, 0.85);
+            position: relative;
+        }
+
+        th {
+            background: linear-gradient(45deg, #6e45e2, #88d3ce);
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        tr {
+            transition: all 0.2s ease;
+        }
+
+        tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Улучшенный ховер-эффект */
+        tr:hover {
+            background: rgba(110, 69, 226, 0.1);
+            transform: scale(1.005);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Стили для статусов */
+        .status {
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .status::before {
+            content: "";
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .status.approved::before {
+            background: #4CAF50;
+            box-shadow: 0 0 8px #4CAF50;
+        }
+
+        .status.rejected::before {
+            background: #F44336;
+            box-shadow: 0 0 8px #F44336;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .table-container {
+                max-height: 400px;
+            }
+            
+            th, td {
+                padding: 12px;
+                font-size: 0.9em;
+            }
+            
+            .status {
+                padding-left: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .table-container {
+                max-height: 300px;
+            }
+        }
+
+        /* Стили для секции преобразования */
+        .conversion-section {
+            padding: 60px 0;
+            background: rgba(0, 0, 0, 0.2);
+            margin-top: 40px;
+        }
+
+        .conversion-info {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .conversion-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .conversion-list li {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(110, 69, 226, 0.1);
+            border-radius: 8px;
+            border-left: 3px solid #6e45e2;
+        }
+
+        .field-name {
+            font-family: monospace;
+            color: #88d3ce;
+            margin-right: 10px;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 100%;
+            margin: 50px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid #6e45e2;
+        }
+        #loanChart {
+            width: 100%!important;
+            height: 100%!important;
+        }
+        .hyperplane-section {
+            padding: 60px 0;
+            background: linear-gradient(45deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .step {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 4px solid #6e45e2;
+            position: relative;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #6e45e2, #88d3ce);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .formula {
+            font-family: monospace;
+            font-size: 1.2em;
+            color: #b8f2e6;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+
+        .graph-legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+
+        #hyperplaneChart{
+            width: 100%!important;
+            height: 100%!important;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot.approved { background: #6e45e2; }
+        .dot.rejected { background: #f44336; }
+        .line {
+            width: 30px;
+            height: 2px;
+            background: #88d3ce;
+        }
+        .prediction-form {
+    padding: 40px 0;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin: 20px 0;
+}
+
+label {
+    display: block;
+    color: #88d3ce;
+    margin-bottom: 8px;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid #6e45e2;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+}
+
+.cta-button {
+    margin-top: 25px;
+    width: 100%;
+}
+.result{
+    font-family: monospace;
+    font-size: 1.2em;
+    color: #b8f2e6;
+    padding: 15px;
+    margin: 10px 0;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+}
+.result-container {
+    height: 600px;
+    margin-top: 40px;
+}
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon"></div>
+                    <div class="logo-text">LoanAI</div>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="index.html">Главная</a></li>
+                        <li><a href="aboutLDA.html">О LDA</a></li>
+                        <li><a href="demo.html">Демо</a></li>
+                        <li><a href="#">Гайды</a></li>
+                        <li><a href="#">О нас</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <div class="demo-page">
+        <div class="credit-demo-block">
+            <h1>Кредитный скоринг с LDA</h1>
+            
+            <div class="credit-demo-content">
+                <p>Linear Discriminant Analysis (LDA) активно применяется в банковской сфере для оценки кредитоспособности заемщиков. Этот метод позволяет классифицировать клиентов на группы риска на основе их финансовых показателей.</p>
+                
+                <p>Наш алгоритм анализирует исторические данные о выплатах кредитов и выявляет скрытые закономерности, помогая банкам принимать обоснованные решения о выдаче кредитов.</p>
+            </div>
+            
+            <div class="credit-features">
+                <div class="feature-cards">
+                    <h3>Оценка рисков</h3>
+                    <p>Точное прогнозирование вероятности дефолта на основе кредитной истории</p>
+                </div>
+                
+                <div class="feature-cards">
+                    <h3>Автоматизация</h3>
+                    <p>Снижение человеческого фактора при принятии кредитных решений</p>
+                </div>
+                
+                <div class="feature-cards">
+                    <h3>Экономия времени</h3>
+                    <p>Мгновенный анализ сотен параметров заемщика</p>
+                </div>
+
+                <div class="feature-cards">
+                    <h3>Персонализация условий</h3>
+                    <p>Индивидуальный подход к определению кредитных условий для каждого клиента</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dataset-section">
+        <div class="dataset-card">
+            <h2>Используемый датасет</h2>
+            
+            <div class="dataset-description">
+                <p>Данные содержат информацию о 4,659 кредитных заявках с следующими характеристиками:</p>
+                
+                <div class="schema-container">
+                    <div class="schema-column">
+                        <div class="schema-item gradient-border">
+                            <span class="column-name">loan_id</span>
+                            <span class="column-type">Уникальный идентификатор</span>
+                            <p>Сервисный номер записи (первичный ключ)</p>
+                        </div>
+                        
+                        <div class="schema-item gradient-border">
+                            <span class="column-name">self_employed</span>
+                            <span class="column-type">Текст [Да/Нет]</span>
+                            <p>Статус самозанятого заявителя</p>
+                        </div>
+                        
+                        <div class="schema-item gradient-border">
+                            <span class="column-name">income_annum</span>
+                            <span class="column-type">Число (bigint)</span>
+                            <p>Годовой доход в INR</p>
+                        </div>
+                    </div>
+                    
+                    <div class="schema-column">
+                        <div class="schema-item gradient-border">
+                            <span class="column-name">loan_amount</span>
+                            <span class="column-type">Число (bigint)</span>
+                            <p>Запрашиваемая сумма кредита</p>
+                        </div>
+                        
+                        <div class="schema-item gradient-border">
+                            <span class="column-name">cibil_score</span>
+                            <span class="column-type">Целое число (integer)</span>
+                            <p>Кредитный рейтинг (300-900)</p>
+                        </div>
+                        
+                        <div class="schema-item gradient-border">
+                            <span class="column-name">loan_status</span>
+                            <span class="column-type">Текст [Одобрено/Отклонено]</span>
+                            <p>Финальное решение по заявке</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-source">
+                    <h3>Источник данных</h3>
+                    <p>В качестве источника данных использовался достаточно популярный сайт Kaggle,
+                         который завоевал свою аудиторию за счет лицензированных датасетов от извествнейших интститутов мира.
+                        Данный датасет был выпущен технологическим институтом MIT, специально для обучения моделей. Данные были собраны в промежутке с 2013 по 2017 год.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="data-table-section">
+        <h2 style="margin-left: 1.5%;">Пример данных из обучающей выборки</h2>
+        <div class="table-container">
+            <table id="loanDataTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Самозанятый</th>
+                        <th>Годовой доход (₹)</th>
+                        <th>Сумма кредита (₹)</th>
+                        <th>Кредитный рейтинг</th>
+                        <th>Статус</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Данные будут заполнены через JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tableBody = document.querySelector('#loanDataTable tbody');
+        
+        // Функция для форматирования чисел с разделителями
+        const formatNumber = num => new Intl.NumberFormat('en-IN').format(num);
+    
+        // Загрузка данных
+        fetch('http://localhost:8000/selectLearnData')
+            .then(response => response.json())
+            .then(data => {
+                tableBody.innerHTML = data.users_data.map(user => `
+                    <tr>
+                        <td>${user.loan_id}</td>
+                        <td>${user.self_employed}</td>
+                        <td>₹${formatNumber(user.income_annum)}</td>
+                        <td>₹${formatNumber(user.loan_amount)}</td>
+                        <td>${user.cibil_score}</td>
+                        <td class="status ${user.loan_status.toLowerCase()}">
+                            ${user.loan_status}
+                        </td>
+                    </tr>
+                `).join('');
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки данных:', error);
+                tableBody.innerHTML = `<tr>
+                    <td colspan="6" class="error">Не удалось загрузить данные</td>
+                </tr>`;
+            });
+    });
+    </script>
+
+    <section class="conversion-section">
+        <div class="container">
+            <div class="conversion-description">
+                <h2>Преобразование данных</h2>
+                <div class="conversion-info">
+                    <p>Исходные данные преобразуются в следующий формат:</p>
+                    <ul class="conversion-list">
+                        <li><span class="field-name">ImportanceCoefficient</span> (float64) - Коэффициент важности заявителя</li>
+                        <li><span class="field-name">Rating</span> (float64) - Интегральный рейтинг</li>
+                        <li><span class="field-name">Class</span> (int) - Класс кредитоспособности (0 - отклонён, 1 - одобрен)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="conversion-chart">
+                <h3>Визуализация преобразованных данных</h3>
+                <div class="chart-container">
+                    <canvas id="loanChart" width="100%!important" height="100%!important"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            const ctx = document.getElementById('loanChart').getContext('2d');
+            
+            // Добавим индикатор загрузки
+            const chartContainer = document.querySelector('.chart-container');
+            chartContainer.innerHTML = '<div class="loading-chart">Загрузка данных...</div>';
+        
+            fetch('http://localhost:8000/getConvData')
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(responseData => {
+                    // Проверяем структуру ответа
+                    
+                    const data = responseData.convesion_data;
+                    window.dataConv = data;
+                    console.log(window.dataConv)
+                    // Удаляем индикатор загрузки
+                    chartContainer.innerHTML = '<canvas id="loanChart"></canvas>';
+        
+                    const chartData = {
+                        datasets: [{
+                            label: 'Одобрено',
+                            data: data.filter(item => item.class === 1)
+                                .map(item => ({x: item.coefficient, y: item.rating})),
+                            backgroundColor: '#6e45e2',
+                            borderColor: '#88d3ce',
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }, {
+                            label: 'Отклонено',
+                            data: data.filter(item => item.class === 0)
+                                .map(item => ({x: item.coefficient, y: item.rating})),
+                            backgroundColor: '#F44336',
+                            borderColor: '#ff8a80',
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }]
+                    };
+                    
+                    new Chart(document.getElementById('loanChart').getContext('2d'), {
+                type: 'scatter',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: {
+                                display: true,
+                                text: 'Importance Coefficient',
+                                color: '#b8f2e6'
+                            },
+                            grid: {
+                                color: 'rgba(136, 211, 206, 0.1)'
+                            },
+                            ticks: {
+                                color: '#88d3ce'
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            title: {
+                                display: true,
+                                text: 'Rating',
+                                color: '#b8f2e6'
+                            },
+                            grid: {
+                                color: 'rgba(136, 211, 206, 0.1)'
+                            },
+                            ticks: {
+                                color: '#88d3ce'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#fff',
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(26, 26, 46, 0.9)',
+                            titleColor: '#6e45e2',
+                            bodyColor: '#88d3ce',
+                            borderColor: '#88d3ce',
+                            borderWidth: 1
+                        }
+                    }
+                }
+            });
+        })
+                .catch(error => {
+                    console.error('Error:', error);
+                    chartContainer.innerHTML = `
+                        <div class="error">
+                            Ошибка загрузки данных: ${error.message}
+                            <button onclick="location.reload()">Обновить</button>
+                        </div>
+                    `;
+                });
+        });
+        </script>
+        <section class="hyperplane-section">
+            <div class="container">
+                <!-- Описание процесса -->
+                <div class="process-description">
+                    <h2>Расчёт разделяющей гиперплоскости</h2>
+                    <div class="process-steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <h3>Оптимизация целевой функции</h3>
+                            <p>Максимизация межклассовой дисперсии:</p>
+                            <div class="formula">
+                                J(w) = <sup>(w<sup>T</sup>S<sub>B</sub>w)</sup>&frasl;<sub>(w<sup>T</sup>S<sub>W</sub>w)</sub>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <h3>Нахождение собственных векторов</h3>
+                            <p>Решение уравнения:</p>
+                            <div class="formula">
+                                S<sub>W</sub><sup>-1</sup>S<sub>B</sub>w = λw
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- График с гиперплоскостью -->
+                <div class="hyperplane-graph" style="width: 100%; height: 100%;">
+                    <div class="chart-container" id="hyperplaneChartContainer">
+                        <canvas id="hyperplaneChart" width="100%!important" height="100%!important"></canvas>
+                    </div>
+                    <div class="graph-legend">
+                        <div class="legend-item">
+                            <span class="dot approved"></span> Одобренные
+                        </div>
+                        <div class="legend-item">
+                            <span class="dot rejected"></span> Отклонённые
+                        </div>
+                        <div class="legend-item">
+                            <span class="line"></span> Гиперплоскость
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var dataConv;
+            var X;
+            var Y;
+            fetch('http://localhost:8000/getConvData')
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(responseData => {                    
+                    dataConv = responseData.convesion_data;
+                })
+            
+            const container = document.getElementById('hyperplaneChartContainer');
+            container.innerHTML = '<div class="loading-chart">Загрузка данных...</div>';
+            fetch('http://localhost:8000/initModel')
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(responseData => {                    
+                    X = responseData.x;
+                    Y = responseData.y;
+                    console.log(dataConv);
+                    console.log(X)
+                    console.log(Y)
+                    container.innerHTML = '<canvas id="hyperplaneChart"></canvas>';
+        
+                    const chartData = {
+                        datasets: [{
+                            type: 'line',
+                            label : 'Гиперплоскость',
+                            data: [{x: X[0], y : Y[0]}, {x:X[1], y:Y[1]}],
+                            backgroundColor: '#88d3ce',
+                            borderColor: '#88d3ce',
+                            borderWidth: 6,
+                            tension: 0, // Прямая линия
+                            pointRadius: 3,
+                            pointHoverRadius: 1,
+                            fill: false
+                        },{
+                            type:'scatter',
+                            label: 'Одобрено',
+                            data: dataConv.filter(item => item.class === 1)
+                                .map(item => ({x: item.coefficient, y: item.rating})),
+                            backgroundColor: '#6e45e2',
+                            borderColor: '#88d3ce',
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }, {
+                            type: 'scatter',
+                            label: 'Отклонено',
+                            data: dataConv.filter(item => item.class === 0)
+                                .map(item => ({x: item.coefficient, y: item.rating})),
+                            backgroundColor: '#F44336',
+                            borderColor: '#ff8a80',
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }]
+                    };
+                    const config = {
+                        data: chartData,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: {
+                                    type: 'linear',
+                                    title: {
+                                        display: true,
+                                        text: 'Importance Coefficient',
+                                        color: '#b8f2e6'
+                                    },
+                                    grid: {
+                                        color: 'rgba(136, 211, 206, 0.1)'
+                                    },
+                                    ticks: {
+                                        color: '#88d3ce'
+                                    }
+                                },
+                                y: {
+                                    type: 'linear',
+                                    title: {
+                                        display: true,
+                                        text: 'Rating',
+                                        color: '#b8f2e6'
+                                    },
+                                    grid: {
+                                        color: 'rgba(136, 211, 206, 0.1)'
+                                    },
+                                    ticks: {
+                                        color: '#88d3ce'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        color: '#fff',
+                                        font: {
+                                            size: 14
+                                        }
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(26, 26, 46, 0.9)',
+                                    titleColor: '#6e45e2',
+                                    bodyColor: '#88d3ce',
+                                    borderColor: '#88d3ce',
+                                    borderWidth: 1
+                                }
+                            }
+                        }
+                    }
+                    const cha = new Chart(document.getElementById('hyperplaneChart').getContext('2d'),config);
+                }) 
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        </script>
+        <section class="prediction-form" style="margin-bottom: 5%;">
+            <div class="container">
+                <h2>Проверка условий кредита</h2>
+                <form id="loanForm">
+                    <div class="form-group">
+                        <label>Самозанятый:</label>
+                        <select id="self_employed" required>
+                            <option value="Yes">Да</option>
+                            <option value="No">Нет</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Годовой доход (₹):</label>
+                        <input type="number" id="income_annum" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Сумма кредита (₹):</label>
+                        <input type="number" id="loan_amount" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Кредитный рейтинг:</label>
+                        <input type="number" id="cibil_score" min="300" max="900" required>
+                    </div>
+                    
+                    <button type="submit" class="cta-button">Получить предсказание</button>
+                </form>
+                
+                <div class="result-container">
+                    <div id="predictionResult"></div>
+                    <div class="chart-container" id="contRes">
+                        <canvas id="predictionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <script>
+            document.getElementById('loanForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                // Сбор данных формы
+                const formData = {
+                    self_employed: document.getElementById('self_employed').value,
+                    income_annum: parseInt(document.getElementById('income_annum').value),
+                    loan_amount: parseInt(document.getElementById('loan_amount').value),
+                    cibil_score: parseInt(document.getElementById('cibil_score').value)
+                };
+                try {
+                    // Отправка POST-запроса
+                    const response = await fetch('http://localhost:8000/predict', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const result = await response.json();
+                    
+                    // Отображение результата
+                    const resultDiv = document.getElementById('predictionResult');
+                    resultDiv.innerHTML = `
+                        <div class="result ${result.predict_model === 'Approved' ? 'Одобрено' : 'Отклонено'}">
+                            Статус: ${result.predict_model}<br>
+                            Вероятность: ${result.score_discrimination}%
+                        </div>
+                    `;
+
+                    // Обновление графика
+                    updateChart(result);
+                    
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert('Произошла ошибка при отправке данных');
+                }
+            });
+            let predictionChart = null;
+            function updateChart(result){
+                if(predictionChart) predictionChart.destroy();
+
+                var dataConv;
+                var X;
+                var Y;
+                fetch('http://localhost:8000/getConvData')
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(responseData => {                    
+                        dataConv = responseData.convesion_data;
+                    })
+                
+                const container = document.getElementById('contRes');
+                container.innerHTML = '<div class="loading-chart">Загрузка данных...</div>';
+                fetch('http://localhost:8000/initModel')
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(responseData => {                    
+                        X = responseData.x;
+                        Y = responseData.y;
+                        console.log(dataConv);
+                        console.log(X)
+                        console.log(Y)
+                        console.log(result)
+                        container.innerHTML = '<canvas id="predictionChart"></canvas>';
+            
+                        const chartData = {
+                            datasets: [{
+                                type: 'line',
+                                label : 'Гиперплоскость',
+                                data: [{x: X[0], y : Y[0]}, {x:X[1], y:Y[1]}],
+                                backgroundColor: '#88d3ce',
+                                borderColor: '#88d3ce',
+                                borderWidth: 6,
+                                tension: 0, // Прямая линия
+                                pointRadius: 3,
+                                pointHoverRadius: 1,
+                                fill: false
+                            },{
+                                type:'scatter',
+                                label: 'Одобрено',
+                                data: dataConv.filter(item => item.class === 1)
+                                    .map(item => ({x: item.coefficient, y: item.rating})),
+                                backgroundColor: '#6e45e2',
+                                borderColor: '#88d3ce',
+                                pointRadius: 5,
+                                pointHoverRadius: 7
+                            }, {
+                                type: 'scatter',
+                                label: 'Предсказание модели',
+                                data: [{x:result.data.coefficient , y: result.data.rating}],
+                                backgroundColor: '#88d3ce',
+                                borderColor: '#ff8a80',
+                                pointRadius: 5,
+                                pointHoverRadius: 7
+                            },{
+                                type: 'scatter',
+                                label: 'Отклонено',
+                                data: dataConv.filter(item => item.class === 0)
+                                    .map(item => ({x: item.coefficient, y: item.rating})),
+                                backgroundColor: '#F44336',
+                                borderColor: '#ff8a80',
+                                pointRadius: 5,
+                                pointHoverRadius: 7
+                            }]
+                        };
+                        const config = {
+                            data: chartData,
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    x: {
+                                        type: 'linear',
+                                        title: {
+                                            display: true,
+                                            text: 'Importance Coefficient',
+                                            color: '#b8f2e6'
+                                        },
+                                        grid: {
+                                            color: 'rgba(136, 211, 206, 0.1)'
+                                        },
+                                        ticks: {
+                                            color: '#88d3ce'
+                                        }
+                                    },
+                                    y: {
+                                        type: 'linear',
+                                        title: {
+                                            display: true,
+                                            text: 'Rating',
+                                            color: '#b8f2e6'
+                                        },
+                                        grid: {
+                                            color: 'rgba(136, 211, 206, 0.1)'
+                                        },
+                                        ticks: {
+                                            color: '#88d3ce'
+                                        }
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        labels: {
+                                            color: '#fff',
+                                            font: {
+                                                size: 14
+                                            }
+                                        }
+                                    },
+                                    tooltip: {
+                                        backgroundColor: 'rgba(26, 26, 46, 0.9)',
+                                        titleColor: '#6e45e2',
+                                        bodyColor: '#88d3ce',
+                                        borderColor: '#88d3ce',
+                                        borderWidth: 1
+                                    }
+                                }
+                            }
+                        }
+                        const cha = new Chart(document.getElementById('predictionChart').getContext('2d'),config);
+                    }) 
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+        </script>
+        <footer>
+            <div class="container">
+                <div class="footer-logo">LoanAI</div>
+                <div class="footer-slogan">Linear Discriminant Analysis — но с человеческим лицом!</div>
+                <div class="social-links">
+                    <a href="#" class="social-link">📘</a>
+                    <a href="#" class="social-link">🐦</a>
+                    <a href="#" class="social-link">📸</a>
+                    <a href="#" class="social-link">💻</a>
+                </div>
+                <div class="copyright">© 2023 LoanAI. Все права защищены.</div>
+            </div>
+        </footer>
+</body>
+</html>
