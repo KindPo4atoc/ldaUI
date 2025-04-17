@@ -19,8 +19,7 @@
                         <li><a href="index.html">Главная</a></li>
                         <li><a href="aboutLDA.html">О LDA</a></li>
                         <li><a href="demo.html">Демо</a></li>
-                        <li><a href="#">Гайды</a></li>
-                        <li><a href="#">О нас</a></li>
+                        <li><a href="about.html">О проекте</a></li>
                     </ul>
                 </nav>
             </div>
@@ -50,8 +49,7 @@
                         </div>
                     </div>
                     <div class="disclaimer">
-                        <p>Все расчеты производятся непосредственно в браузере. 
-                        Исходный код доступен на <a href="#">GitHub</a>.</p>
+                        <p>Все расчеты производятся непосредственно в браузере.</p>
                     </div>
                 </div>
             </div>
@@ -133,9 +131,21 @@
                     </div>
                 </div>
 
+                <div class="calculation-step">
+                    <h3>Шаг 3: Межклассовая матрица рассеяния</h3>
+                    <p>Данная матрица рассчитывается относительно средних значений классов. Она показывает насколько классы хорошо разделены между собой.</p>
+                    <div class="formula">
+                        S<sub>B</sub> = Σ(μ<sub>1</sub> - μ<sub>2</sub>)(μ<sub>1</sub> - μ<sub>2</sub>)<sup>T</sup>
+                    </div>
+                    <p>В результате получается матрица размерностью n на n.</p>
+                    <div class="calculation-result">
+                        <p>S<sub>W</sub> = [[1.85, 2.55],<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[2.55, 3.90]]</p>
+                    </div>
+                </div>
                 <!-- Шаг 3 -->
                 <div class="calculation-step">
-                    <h3>Шаг 3: Собственные векторы</h3>
+                    <h3>Шаг 4: Собственные векторы</h3>
                     <p>Данный шаг является последним в расчете. Его результат дает коэффициенты альфа и бета, а также коэффициента смещения модели.</p>
                     <div class="formula">
                         S<sub>W</sub><sup>-1</sup>S<sub>B</sub>w = λw
@@ -148,16 +158,17 @@
                 </div>
 
                 <div class="calculation-step">
-                    <h3>Шаг 4: Получение предикта</h3>
-                    <p>Данный шаг осуществляет логику предстказания модели исходя из формулы ниже/</p>
+                    <h3>Шаг 5: Получение предикта</h3>
+                    <p>Шаг является заключительным, предикт вычисляется относительно формулы расстояний центроиды Махаланобиса, которая показывает насколько близко элемент лежит к центроидам.</p>
                     <div class="formula">
-                        w<sub>1</sub>x<sub>1</sub> + w<sub>2</sub>x<sub>2</sub> + λ = result
-                        <p>result > 0, result ∈ 1 классу, в противном случае result ∈ 2 классу</p>
+                        D<sub>M</sub>(x,μ) = (x - μ)<sup>T</sup>S<sup>-1</sup>*(x - μ) 
+                        Predict = argmax(D<sub>M</sub>)
+                        <p>После расчета расстояний результат будет содержать n количество расстояний, максимальное из которых будет предиктом.</p>
                     </div>
                     <p>В качестве примера ниже представлен результат получения предикта, где входными данными являются признаки X</p>
                     <div class="calculation-result">
-                        <p>result = -0.231</p>
-                        <p>2 класс, поскольку result < 0</p>
+                        <p>D<sub>M</sub> = [1.231, 2.91]</p>
+                        <p>2 класс, поскольку 2.91 > 1.231</p>
                     </div>
                 </div>
             </div>
@@ -180,7 +191,7 @@
                         <div class="axis x-axis"></div>
                         <div class="axis y-axis"></div>
                         <div class="hyperplane" 
-                        style="transform: rotate(-30deg) translateY(-50%); 
+                        style="transform: rotate(-15deg); 
                         top: 90%; 
                         left: 20%"></div>
                         
@@ -199,6 +210,12 @@
                         <div class="data-point" style="left:80%;top:75%" data-class="2"></div>
                         <div class="data-point" style="left:85%;top:80%" data-class="2"></div>
                         <div class="data-point" style="left:90%;top:85%" data-class="2"></div>
+                    </div>
+                </div>
+                <div class="description-block" style="margin-top: 2.5%;">
+                    <h2>Пояснение</h2>
+                    <div class="text-explanation">
+                        <p>Для данного примера, на простых не прикладных данных, было получено одномерное пространство, которое при проецирование на него точек будет идеально разделять классы.</p>
                     </div>
                 </div>
             </div>

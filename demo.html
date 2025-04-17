@@ -6,6 +6,7 @@
     <title>LoanAI Демо | Кредитный анализ</title>
     <link rel="stylesheet" href="css/styleIndex.css">
     <link rel="stylesheet" href="css/styleAbout.css">
+    <script src="js/carousel.js"></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
         <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.17/vue.min.js'></script>
         <script  src = 'https://cdn.jsdelivr.net/npm/chart.js'> </script>
@@ -167,6 +168,7 @@
             background: rgba(255, 255, 255, 0.03);
             border-radius: 12px;
             margin: 20px 2.5%;
+            text-align: center;
         }
 
         /* Скрываем скроллбар */
@@ -266,6 +268,8 @@
         .conversion-info {
             background: rgba(255, 255, 255, 0.03);
             padding: 25px;
+            line-height: 1.5;
+            text-align: justify;
             border-radius: 15px;
             margin: 20px 0;
         }
@@ -378,47 +382,84 @@
             background: #88d3ce;
         }
         .prediction-form {
-    padding: 40px 0;
-    background: rgba(0, 0, 0, 0.1);
+            padding: 40px 0;
+            background: rgba(0, 0, 0, 0.27);
+        }
+
+        .form-group {
+            margin: 20px 0;
+        }
+
+        label {
+            display: block;
+            color: #88d3ce;
+            margin-bottom: 8px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #6e45e2;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .cta-button {
+            margin-top: 25px;
+            width: 100%;
+        }
+        .result{
+            font-family: monospace;
+            font-size: 1.2em;
+            color: #b8f2e6;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(0, 0, 0, 0.3);
+            height: 100%;
+            border-radius: 8px;
+        }
+        .result-container {
+            height: 550px;
+            margin-top: 40px;
+        }
+        .conversion-chart .carousel-container {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  margin: 0 auto;
 }
 
-.form-group {
-    margin: 20px 0;
+.carousel {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
 }
 
-label {
-    display: block;
-    color: #88d3ce;
-    margin-bottom: 8px;
+.carousel-item {
+  min-width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-input, select {
-    width: 100%;
-    padding: 12px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid #6e45e2;
-    border-radius: 8px;
-    color: white;
-    font-size: 16px;
+.carousel-item canvas {
+  width: 100% !important; /* Важно для адаптивности Chart.js */
+  height: 100% !important;
 }
 
-.cta-button {
-    margin-top: 25px;
-    width: 100%;
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.5);
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
 }
-.result{
-    font-family: monospace;
-    font-size: 1.2em;
-    color: #b8f2e6;
-    padding: 15px;
-    margin: 10px 0;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 8px;
-}
-.result-container {
-    height: 600px;
-    margin-top: 40px;
-}
+
+.prev { left: 10px; }
+.next { right: 10px; }
     </style>
 </head>
 <body>
@@ -434,8 +475,7 @@ input, select {
                         <li><a href="index.html">Главная</a></li>
                         <li><a href="aboutLDA.html">О LDA</a></li>
                         <li><a href="demo.html">Демо</a></li>
-                        <li><a href="#">Гайды</a></li>
-                        <li><a href="#">О нас</a></li>
+                        <li><a href="about.html">О проекте</a></li>
                     </ul>
                 </nav>
             </div>
@@ -490,9 +530,9 @@ input, select {
                         </div>
                         
                         <div class="schema-item gradient-border">
-                            <span class="column-name">self_employed</span>
-                            <span class="column-type">Текст [Да/Нет]</span>
-                            <p>Статус самозанятого заявителя</p>
+                            <span class="column-name">loan_term</span>
+                            <span class="column-type">Число (integer)</span>
+                            <p>Срок выплаты кредита</p>
                         </div>
                         
                         <div class="schema-item gradient-border">
@@ -539,9 +579,9 @@ input, select {
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Самозанятый</th>
                         <th>Годовой доход (₹)</th>
                         <th>Сумма кредита (₹)</th>
+                        <th>Срок кредита</th>
                         <th>Кредитный рейтинг</th>
                         <th>Статус</th>
                     </tr>
@@ -567,9 +607,9 @@ input, select {
                 tableBody.innerHTML = data.users_data.map(user => `
                     <tr>
                         <td>${user.loan_id}</td>
-                        <td>${user.self_employed}</td>
                         <td>₹${formatNumber(user.income_annum)}</td>
                         <td>₹${formatNumber(user.loan_amount)}</td>
+                        <td>${user.loan_term}</td>
                         <td>${user.cibil_score}</td>
                         <td class="status ${user.loan_status.toLowerCase()}">
                             ${user.loan_status}
@@ -586,138 +626,40 @@ input, select {
     });
     </script>
 
-    <section class="conversion-section">
+    <section class="conversion-section" style="width: 100%; height: 70%;">
         <div class="container">
             <div class="conversion-description">
-                <h2>Преобразование данных</h2>
+                <h2>Изначальное состояние данных</h2>
                 <div class="conversion-info">
-                    <p>Исходные данные преобразуются в следующий формат:</p>
+                    <p>Для визуализации полной картины данных, необходимо реализовать график размерностью <i>K</i>, где <i>K</i>
+                        это количество признаков в датасете. В выбранном датасете имеется 4 признака:
+                    </p>
                     <ul class="conversion-list">
-                        <li><span class="field-name">ImportanceCoefficient</span> (float64) - Коэффициент важности заявителя</li>
-                        <li><span class="field-name">Rating</span> (float64) - Интегральный рейтинг</li>
-                        <li><span class="field-name">Class</span> (int) - Класс кредитоспособности (0 - отклонён, 1 - одобрен)</li>
+                        <li><span class="field-name">loan_term</span> Срок кредита</li>
+                        <li><span class="field-name">income_annum</span> Заработная плата за год</li>
+                        <li><span class="field-name">loan_amount</span> Сумма, которую клиент хочет взять в кредит</li>
+                        <li><span class="field-name">cibil_score</span> Кредитный рейтинг</li>
                     </ul>
+                    <p>В настоящее время нет способа представить такой график, при нынешних технологиях. Поэтому ниже будут приведены графики в 2D измерении
+                        с комбинациями признаков.
+                    </p>
                 </div>
             </div>
-
+            
             <div class="conversion-chart">
-                <h3>Визуализация преобразованных данных</h3>
-                <div class="chart-container">
-                    <canvas id="loanChart" width="100%!important" height="100%!important"></canvas>
+                <h3>Визуализация исходных данных</h3>
+                <div class="carousel-container">
+                    <div class="carousel-item active">
+                        <div class="chart-container">
+                            <canvas id="loanCharts" width="100%!important" height="100%!important"></canvas>
+                        </div>
+                    </div>
+                    <button class="carousel-button prev">←</button>
+                    <button class="carousel-button next">→</button>
                 </div>
-            </div>
+            </div>  
         </div>
     </section>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            
-            const ctx = document.getElementById('loanChart').getContext('2d');
-            
-            // Добавим индикатор загрузки
-            const chartContainer = document.querySelector('.chart-container');
-            chartContainer.innerHTML = '<div class="loading-chart">Загрузка данных...</div>';
-        
-            fetch('http://localhost:8000/getConvData')
-                .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    return response.json();
-                })
-                .then(responseData => {
-                    // Проверяем структуру ответа
-                    
-                    const data = responseData.convesion_data;
-                    window.dataConv = data;
-                    console.log(window.dataConv)
-                    // Удаляем индикатор загрузки
-                    chartContainer.innerHTML = '<canvas id="loanChart"></canvas>';
-        
-                    const chartData = {
-                        datasets: [{
-                            label: 'Одобрено',
-                            data: data.filter(item => item.class === 1)
-                                .map(item => ({x: item.coefficient, y: item.rating})),
-                            backgroundColor: '#6e45e2',
-                            borderColor: '#88d3ce',
-                            pointRadius: 5,
-                            pointHoverRadius: 7
-                        }, {
-                            label: 'Отклонено',
-                            data: data.filter(item => item.class === 0)
-                                .map(item => ({x: item.coefficient, y: item.rating})),
-                            backgroundColor: '#F44336',
-                            borderColor: '#ff8a80',
-                            pointRadius: 5,
-                            pointHoverRadius: 7
-                        }]
-                    };
-                    
-                    new Chart(document.getElementById('loanChart').getContext('2d'), {
-                type: 'scatter',
-                data: chartData,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            type: 'linear',
-                            title: {
-                                display: true,
-                                text: 'Importance Coefficient',
-                                color: '#b8f2e6'
-                            },
-                            grid: {
-                                color: 'rgba(136, 211, 206, 0.1)'
-                            },
-                            ticks: {
-                                color: '#88d3ce'
-                            }
-                        },
-                        y: {
-                            type: 'linear',
-                            title: {
-                                display: true,
-                                text: 'Rating',
-                                color: '#b8f2e6'
-                            },
-                            grid: {
-                                color: 'rgba(136, 211, 206, 0.1)'
-                            },
-                            ticks: {
-                                color: '#88d3ce'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: '#fff',
-                                font: {
-                                    size: 14
-                                }
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(26, 26, 46, 0.9)',
-                            titleColor: '#6e45e2',
-                            bodyColor: '#88d3ce',
-                            borderColor: '#88d3ce',
-                            borderWidth: 1
-                        }
-                    }
-                }
-            });
-        })
-                .catch(error => {
-                    console.error('Error:', error);
-                    chartContainer.innerHTML = `
-                        <div class="error">
-                            Ошибка загрузки данных: ${error.message}
-                            <button onclick="location.reload()">Обновить</button>
-                        </div>
-                    `;
-                });
-        });
-        </script>
         <section class="hyperplane-section">
             <div class="container">
                 <!-- Описание процесса -->
@@ -740,6 +682,14 @@ input, select {
                                 S<sub>W</sub><sup>-1</sup>S<sub>B</sub>w = λw
                             </div>
                         </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <h3>Трансформация исходного пространства в пространство LDA</h3>
+                            <p>Преобразование:</p>
+                            <div class="formula">
+                                X<sub>lda</sub> = Data * w
+                            </div>
+                        </div>
                     </div>
                 </div>
         
@@ -748,15 +698,20 @@ input, select {
                     <div class="chart-container" id="hyperplaneChartContainer">
                         <canvas id="hyperplaneChart" width="100%!important" height="100%!important"></canvas>
                     </div>
-                    <div class="graph-legend">
-                        <div class="legend-item">
-                            <span class="dot approved"></span> Одобренные
-                        </div>
-                        <div class="legend-item">
-                            <span class="dot rejected"></span> Отклонённые
-                        </div>
-                        <div class="legend-item">
-                            <span class="line"></span> Гиперплоскость
+                </div>
+                <div class="process-description">
+                    <div class="process-steps">
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <h3>Осуществление прогноза</h3>
+                            <p>Расстояние Махаланобиса:</p>
+                            <div class="formula">
+                                D<sub>M</sub>(x,μ) = (x - μ)<sup>T</sup>S<sup>-1</sup>*(x - μ) 
+                            </div>
+                            <p>Правило выбора значения:</p>
+                            <div class="formula">
+                                Predict = argmax(D<sub>M</sub>)
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -764,66 +719,39 @@ input, select {
         </section>
         <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var dataConv;
-            var X;
-            var Y;
+            const container = document.getElementById('hyperplaneChartContainer');
+            container.innerHTML = '<div class="loading-chart">Загрузка данных...</div>';
             fetch('http://localhost:8000/getConvData')
                 .then(response => {
                     if (!response.ok) throw new Error('Network response was not ok');
                     return response.json();
                 })
                 .then(responseData => {                    
-                    dataConv = responseData.convesion_data;
-                })
-            
-            const container = document.getElementById('hyperplaneChartContainer');
-            container.innerHTML = '<div class="loading-chart">Загрузка данных...</div>';
-            fetch('http://localhost:8000/initModel')
-                .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    return response.json();
-                })
-                .then(responseData => {                    
-                    X = responseData.x;
-                    Y = responseData.y;
-                    console.log(dataConv);
-                    console.log(X)
-                    console.log(Y)
                     container.innerHTML = '<canvas id="hyperplaneChart"></canvas>';
         
+                    const data = responseData
+                    const filteredData = data.class.map((cl, index) => ({ class: cl, x: data.x[index], y: data.y[index] })) 
                     const chartData = {
                         datasets: [{
-                            type: 'line',
-                            label : 'Гиперплоскость',
-                            data: [{x: X[0], y : Y[0]}, {x:X[1], y:Y[1]}],
-                            backgroundColor: '#88d3ce',
-                            borderColor: '#88d3ce',
-                            borderWidth: 6,
-                            tension: 0, // Прямая линия
-                            pointRadius: 3,
-                            pointHoverRadius: 1,
-                            fill: false
-                        },{
-                            type:'scatter',
-                            label: 'Одобрено',
-                            data: dataConv.filter(item => item.class === 1)
-                                .map(item => ({x: item.coefficient, y: item.rating})),
+                            label: "Одобрено",
+                            data: filteredData.filter(item => item.class === 1) 
+                                            .map(item => ({ x: item.x, y: item.y })),
                             backgroundColor: '#6e45e2',
                             borderColor: '#88d3ce',
-                            pointRadius: 5,
-                            pointHoverRadius: 7
+                            pointRadius: 2,
+                            pointHoverRadius: 2
                         }, {
-                            type: 'scatter',
                             label: 'Отклонено',
-                            data: dataConv.filter(item => item.class === 0)
-                                .map(item => ({x: item.coefficient, y: item.rating})),
+                            data: filteredData.filter(item => item.class === 0) 
+                            .map(item => ({ x: item.x, y: item.y })),
                             backgroundColor: '#F44336',
                             borderColor: '#ff8a80',
-                            pointRadius: 5,
+                            pointRadius: 2,
                             pointHoverRadius: 7
                         }]
                     };
                     const config = {
+                        type:"scatter",
                         data: chartData,
                         options: {
                             responsive: true,
@@ -884,18 +812,10 @@ input, select {
                 });
             });
         </script>
-        <section class="prediction-form" style="margin-bottom: 5%;">
+        <section class="prediction-form" style="height: 1350px; margin-bottom: 5%;">
             <div class="container">
                 <h2>Проверка условий кредита</h2>
                 <form id="loanForm">
-                    <div class="form-group">
-                        <label>Самозанятый:</label>
-                        <select id="self_employed" required>
-                            <option value="Yes">Да</option>
-                            <option value="No">Нет</option>
-                        </select>
-                    </div>
-                    
                     <div class="form-group">
                         <label>Годовой доход (₹):</label>
                         <input type="number" id="income_annum" required>
@@ -905,7 +825,12 @@ input, select {
                         <label>Сумма кредита (₹):</label>
                         <input type="number" id="loan_amount" required>
                     </div>
-                    
+
+                    <div class="form-group">
+                        <label>Срок кредита:</label>
+                        <input type="number" id="loan_term" required>
+                    </div>
+
                     <div class="form-group">
                         <label>Кредитный рейтинг:</label>
                         <input type="number" id="cibil_score" min="300" max="900" required>
@@ -915,10 +840,10 @@ input, select {
                 </form>
                 
                 <div class="result-container">
-                    <div id="predictionResult"></div>
                     <div class="chart-container" id="contRes">
                         <canvas id="predictionChart"></canvas>
                     </div>
+                    <div id="predictionResult"></div>
                 </div>
             </div>
         </section>
@@ -928,7 +853,7 @@ input, select {
                 
                 // Сбор данных формы
                 const formData = {
-                    self_employed: document.getElementById('self_employed').value,
+                    loan_term: document.getElementById('loan_term').value,
                     income_annum: parseInt(document.getElementById('income_annum').value),
                     loan_amount: parseInt(document.getElementById('loan_amount').value),
                     cibil_score: parseInt(document.getElementById('cibil_score').value)
@@ -948,9 +873,10 @@ input, select {
                     // Отображение результата
                     const resultDiv = document.getElementById('predictionResult');
                     resultDiv.innerHTML = `
-                        <div class="result ${result.predict_model === 'Approved' ? 'Одобрено' : 'Отклонено'}">
-                            Статус: ${result.predict_model}<br>
-                            Вероятность: ${result.score_discrimination}%
+                        <div class="result">
+                            Статус: ${result.predict_model === 1 ? 'Одобрено' : 'Отклонено'}<br>
+                            Совет: ${result.score_discrimination[0] - result.score_discrimination[1] > 0 ? 'Вам необходимо подтянуть некоторые параметры для возможности взятия кредита.':
+                            'У вас хорошие показатели для одобрения кредита. Рекомендую обратиться в отделение банка для оформления.'}
                         </div>
                     `;
 
@@ -966,75 +892,52 @@ input, select {
             function updateChart(result){
                 if(predictionChart) predictionChart.destroy();
 
-                var dataConv;
-                var X;
-                var Y;
+                const container = document.getElementById('contRes');
+                container.innerHTML = '<div class="loading-chart">Загрузка данных...</div>';
+
+                
                 fetch('http://localhost:8000/getConvData')
                     .then(response => {
                         if (!response.ok) throw new Error('Network response was not ok');
                         return response.json();
                     })
-                    .then(responseData => {                    
-                        dataConv = responseData.convesion_data;
-                    })
-                
-                const container = document.getElementById('contRes');
-                container.innerHTML = '<div class="loading-chart">Загрузка данных...</div>';
-                fetch('http://localhost:8000/initModel')
-                    .then(response => {
-                        if (!response.ok) throw new Error('Network response was not ok');
-                        return response.json();
-                    })
-                    .then(responseData => {                    
-                        X = responseData.x;
-                        Y = responseData.y;
-                        console.log(dataConv);
-                        console.log(X)
-                        console.log(Y)
-                        console.log(result)
+                    .then(responseData => {   
+                        console.log(result)   
+                        console.log(result.data[0][1])  
+                        dataXY = result.data          
+                        const data = responseData
+                        const filteredData = data.class.map((cl, index) => ({ class: cl, x: data.x[index], y: data.y[index] }))
                         container.innerHTML = '<canvas id="predictionChart"></canvas>';
             
                         const chartData = {
                             datasets: [{
-                                type: 'line',
-                                label : 'Гиперплоскость',
-                                data: [{x: X[0], y : Y[0]}, {x:X[1], y:Y[1]}],
+                                label: 'Данные пользователя',
+                                data: dataXY.map (item  => ({x:item[0], y:item[1]})),
                                 backgroundColor: '#88d3ce',
                                 borderColor: '#88d3ce',
-                                borderWidth: 6,
-                                tension: 0, // Прямая линия
-                                pointRadius: 3,
-                                pointHoverRadius: 1,
-                                fill: false
+                                pointRadius: 4,
+                                pointHoverRadius: 7
                             },{
-                                type:'scatter',
                                 label: 'Одобрено',
-                                data: dataConv.filter(item => item.class === 1)
-                                    .map(item => ({x: item.coefficient, y: item.rating})),
+                                data: filteredData.filter(item => item.class === 1) 
+                                        .map(item => ({ x: item.x, y: item.y })),
                                 backgroundColor: '#6e45e2',
                                 borderColor: '#88d3ce',
-                                pointRadius: 5,
-                                pointHoverRadius: 7
-                            }, {
-                                type: 'scatter',
-                                label: 'Предсказание модели',
-                                data: [{x:result.data.coefficient , y: result.data.rating}],
-                                backgroundColor: '#88d3ce',
-                                borderColor: '#ff8a80',
-                                pointRadius: 5,
+                                pointRadius: 2,
                                 pointHoverRadius: 7
                             },{
-                                type: 'scatter',
+                                
                                 label: 'Отклонено',
-                                data: dataConv.filter(item => item.class === 0)
-                                    .map(item => ({x: item.coefficient, y: item.rating})),
+                                data: filteredData.filter(item => item.class === 0) 
+                                .map(item => ({ x: item.x, y: item.y })),
                                 backgroundColor: '#F44336',
                                 borderColor: '#ff8a80',
-                                pointRadius: 5,
+                                pointRadius: 2,
                                 pointHoverRadius: 7
                             }]
                         };
                         const config = {
+                            type:"scatter",
                             data: chartData,
                             options: {
                                 responsive: true,
