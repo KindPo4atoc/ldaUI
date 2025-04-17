@@ -34,16 +34,14 @@
 | Gorilla/mux| Роутинг |
 | Gonum      | Математические вычисления |
 | PostgreSQL | Хранение моделей и данных |
-| Docker     | Контейнеризация |
 
 ## ⚡️ Быстрый старт
 
 ### Требования
 - Node.js 16+
-- Go 1.21+
-- PostgreSQL 14+
+- lda_api [https://github.com/KindPo4atoc/lda_api]
 
 ### Установка
 1. Клонировать репозиторий:
 ```bash
-git clone https://github.com/yourusername/lda-web-interface.git
+git clone https://github.com/KindPo4atoc/ldaUI.git
