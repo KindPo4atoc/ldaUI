@@ -4,7 +4,227 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="css/styleIndex.css">
     <link rel="stylesheet" href="css/styleAbout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-twilight.min.css">
     <title>LDA Подробно | LoanAI</title>
+    <style>
+        /* Общие стили документации */
+        .api-docs {
+            padding: 40px 0;
+            min-height: 100vh;
+        }
+
+        .endpoint-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            border: 1px solid rgba(110, 69, 226, 0.3);
+            margin: 20px auto;
+            padding: 25px;
+            max-width: 800px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 40px rgba(110, 69, 226, 0.1);
+        }
+        .endpoint-card p {
+            padding-left: 1.5%;
+            margin-top: 1.5%;
+            margin-bottom: 1.5%;
+        }
+        .endpoint-card h4{
+            margin-bottom: 0.5%;
+            margin-top: 0.5%;
+        }
+        .endpoint-header {
+            border-bottom: 2px solid #6e45e2;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .method-get {
+            color: #88d3ce;
+            margin-top: 1%;
+            border: 1px solid #88d3ce;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .method-post {
+            color: #b8f2e6;
+            margin-top: 1%;
+            border: 1px solid #b8f2e6;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .json-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            position: relative;
+        }
+
+        .json-key { color: #6e45e2; }
+        .json-string { color: #88d3ce; }
+        .json-number { color: #b8f2e6; }
+        .json-boolean { color: #ff6b6b; }
+
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* Анимации */
+        @keyframes card-entrance {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .endpoint-card {
+            animation: card-entrance 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .endpoint-card {
+                margin: 10px;
+                padding: 15px;
+            }
+            
+            pre {
+                font-size: 0.9em;
+            }
+        }
+        .code-example {
+            margin-top: 25px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid #6e45e2;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(110, 69, 226, 0.3);
+        }
+
+        .copy-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            transition: transform 0.2s;
+        }
+
+        .copy-button:hover {
+            transform: scale(1.1);
+        }
+
+        .copy-button.copied {
+            animation: bounce 0.5s;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        .js-code {
+            padding: 15px;
+            margin: 0;
+            overflow-x: auto;
+            color: #b8f2e6;
+            font-family: 'Fira Code', monospace;
+        }
+
+        pre[class*="language-"] {
+            height: 100%;
+            border: none;
+            margin: 1%;
+        }
+
+        .token.keyword { color: #6e45e2 !important; }
+        .token.function { color: #88d488 !important; }
+        .token.string { color: #bd4242 !important; }
+        .token.number { color: #ff6b6b !important; }
+        .token.comment { color: #6272a4 !important; }
+        .token.operator { color: #ff79c6 !important; }
+        .token.property { color: #0e9c92 !important; }
+
+        .copy-notification {
+            position: fixed;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(110, 69, 226, 0.9);
+            color: #b8f2e6;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-family: 'Segoe UI', sans-serif;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            z-index: 1000;
+        }
+
+        .copy-notification.show {
+            bottom: 20px;
+            opacity: 1;
+        }
+
+        @keyframes float {
+            0% { transform: translate(-50%, 0); }
+            50% { transform: translate(-50%, -5px); }
+            100% { transform: translate(-50%, 0); }
+        }
+
+        .copy-notification.show {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+    <script>
+        function copyCode(button) {
+        const codeBlock = button.closest('.code-example').querySelector('code');
+        const textArea = document.createElement('textarea');
+        textArea.value = codeBlock.innerText;
+        document.body.appendChild(textArea);
+        textArea.select();
+        
+        try {
+            document.execCommand('copy');
+            showCopyNotification();
+        } catch (err) {
+            console.error('Copy failed:', err);
+            showCopyNotification('Ошибка копирования!', 'error');
+        }
+            document.body.removeChild(textArea);
+        }
+
+        function showCopyNotification(message = ' Код скопирован!', type = 'success') {
+            const notification = document.getElementById('copyNotification');
+            
+            // Меняем стили для разных типов уведомлений
+            if(type === 'error') {
+                notification.style.background = 'rgba(244, 67, 54, 0.9)';
+                notification.innerHTML = '❌ ' + message;
+            } else {
+                notification.style.background = 'rgba(110, 69, 226, 0.9)';
+                notification.innerHTML = '✅ ' + message;
+            }
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 2000);
+        }
+    </script>
 </head>
 <body>
     <header>
@@ -17,7 +237,7 @@
                 <nav>
                     <ul>
                         <li><a href="index.html">Главная</a></li>
-                        <li><a href="aboutLDA.html">О LDA</a></li>
+                        <li><a href="aboutLDA.html">Endpoints</a></li>
                         <li><a href="demo.html">Демо</a></li>
                         <li><a href="about.html">О проекте</a></li>
                     </ul>
@@ -27,201 +247,214 @@
     </header>
 
     <!-- Добавляем после секции с результатами и перед футером -->
-    <section class="about-page">
-        <div class="container">
-            <div class="about-card">
-                <div class="about-icon">🧠</div>
-                <h2>О данной странице</h2>
-                <div class="about-content">
-                    <p>Это интерактивное руководство по Linear Discriminant Analysis создано для:</p>
-                    <ul style="list-style: none;">
-                        <li>Наглядной визуализации ключевых концепций LDA</li>
-                        <li>Демонстрации математического аппарата "в действии"</li>
-                        <li>Практического понимания работы алгоритма</li>
-                    </ul>
-                    <div class="tech-stack">
-                        <h3>Используемые технологии:</h3>
-                        <div class="tech-items">
-                            <div class="tech-item">HTML5 Canvas</div>
-                            <div class="tech-item">CSS3 Animations</div>
-                            <div class="tech-item">JavaScript Math</div>
-                            <div class="tech-item">WebGL</div>
-                        </div>
-                    </div>
-                    <div class="disclaimer">
-                        <p>Все расчеты производятся непосредственно в браузере.</p>
-                    </div>
+    <section class="api-docs">
+        <!-- Пример документации для GET /selectLearnData -->
+        <div class="endpoint-card">
+            <div class="endpoint-header">
+                <h2 class="gradient-text">/selectLearnData</h2>
+                <span class="method-get">GET</span>
+            </div>
+            <h4>Описание:</h4>
+            <p>Запрос возвращает данные о пользователях, которые использовались для обучения модели</p>
+            <h4>Входные данные: Отсутствуют</h4>
+            <h4>Выходные данные:</h4>
+            <div class="json-container">
+                <pre>
+    <code>{
+        <span class="json-key">"users_data"</span>: [
+            {
+            <span class="json-key">"loan_id"</span>: <span class="json-number">1</span>,
+            <span class="json-key">"loan_term"</span>: <span class="json-number">12</span>,
+            <span class="json-key">"income_annum"</span>: <span class="json-number">9600000</span>,
+            <span class="json-key">"loan_amount"</span>: <span class="json-number">29900000</span>,
+            <span class="json-key">"cibil_score"</span>: <span class="json-number">778</span>,
+            <span class="json-key">"loan_status"</span>: <span class="json-string">"Approved"</span>
+            },
+            {
+            <span class="json-key">"loan_id"</span>: <span class="json-number">2</span>,
+            <span class="json-key">"loan_term"</span>: <span class="json-number">8</span>,
+            <span class="json-key">"income_annum"</span>: <span class="json-number">4100000</span>,
+            <span class="json-key">"loan_amount"</span>: <span class="json-number">12200000</span>,
+            <span class="json-key">"cibil_score"</span>: <span class="json-number">417</span>,
+            <span class="json-key">"loan_status"</span>: <span class="json-string">"Rejected"</span>
+            }
+        ]
+    }</code>
+                </pre>
+            </div>
+            <div class="code-example">
+                <div class="code-header">
+                    <span>Пример запроса на JavaScript</span>
+                    <button class="copy-button" onclick="copyCode(this)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                            <path d="M19 21H8V7h11m0-2H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2m-3-4H4a2 2 0 0 0-2 2v14h2V3h12V1z" 
+                                  fill="#b8f2e6"/>
+                        </svg>
+                    </button>
                 </div>
+<pre><code class="language-javascript">fetch('http://localhost:8000/selectLearnData')
+.then(response => response.json())
+.then(data => {
+    console.log(data.users_data);
+})
+.catch(error => {
+    console.error('Ошибка загрузки данных:', error);
+});</code></pre>
             </div>
         </div>
-    </section>
+        </div>
 
-    <section class="lda-demo" style="padding-top: 2.5%; padding-bottom: 2.5%;">
-        <div class="container">
-            <!-- Фиксированные данные -->
-            <div class="data-section">
-                <div class="description-block">
-                    <h2>Исходные данные</h2>
-                    <div class="text-explanation">
-                        <p>Анализируемые данные содержат:</p>
-                        <ul>
-                            <li>2 четко разделенных класса</li>
-                            <li>По 7 точек в каждом классе</li>
-                            <li>Искусственно сгенерированные координаты</li>
-                            <li>Цель: нахождение оптимальной разделяющей границы</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="visualization-block">
-                    <div class="plot-container">
-                        <div class="axis x-axis"></div>
-                        <div class="axis y-axis"></div>
-                        <!-- Класс 1 -->
-                        <div class="data-point" style="left:10%;top:20%" data-class="1"></div>
-                        <div class="data-point" style="left:15%;top:25%" data-class="1"></div>
-                        <div class="data-point" style="left:20%;top:30%" data-class="1"></div>
-                        <div class="data-point" style="left:25%;top:35%" data-class="1"></div>
-                        <div class="data-point" style="left:30%;top:40%" data-class="1"></div>
-                        <div class="data-point" style="left:35%;top:45%" data-class="1"></div>
-                        <div class="data-point" style="left:40%;top:50%" data-class="1"></div>
-                        
-                        <!-- Класс 2 -->
-                        <div class="data-point" style="left:60%;top:55%" data-class="2"></div>
-                        <div class="data-point" style="left:65%;top:60%" data-class="2"></div>
-                        <div class="data-point" style="left:70%;top:65%" data-class="2"></div>
-                        <div class="data-point" style="left:75%;top:70%" data-class="2"></div>
-                        <div class="data-point" style="left:80%;top:75%" data-class="2"></div>
-                        <div class="data-point" style="left:85%;top:80%" data-class="2"></div>
-                        <div class="data-point" style="left:90%;top:85%" data-class="2"></div>
-                    </div>
-                </div>
+        <div class="endpoint-card">
+            <div class="endpoint-header">
+                <h2 class="gradient-text">/getParamModel</h2>
+                <span class="method-get">GET</span>
             </div>
-
-            <!-- Расчеты -->
-            <div class="calculations">
-                <!-- Шаг 1 -->
-                <div class="calculation-step">
-                    <h3>Шаг 1: Вычисление средних значений классов</h3>
-                    <p>На этом шаге производится расчет средних значений признаков класса. Для этого используется формула представленная ниже.</p>
-                    <div class="formula">
-                        μ<sub>k</sub> = (1/N<sub>k</sub>) Σx<sub>i</sub>
-                    </div>
-                    <p>Путем подставления данных в формулу получается следующий результат расположенный ниже.</p>
-                    <div class="calculation-result">
-                        <p>Класс 1: (0.25, 0.35)</p>
-                        <p>Класс 2: (0.75, 0.70)</p>
-                    </div>
-                </div>
-
-                <!-- Шаг 2 -->
-                <div class="calculation-step">
-                    <h3>Шаг 2: Внутриклассовая матрица рассеяния</h3>
-                    <p>На данном шаге производится расчет внутриклассовой матрицы рассеивания, которая показывает как ведут себя данные внутри класса.</p>
-                    <div class="formula">
-                        S<sub>Wi</sub> = Σ(x - μ<sub>k</sub>)(x - μ<sub>k</sub>)<sup>T</sup>
-                    </div>
-                    <p>Данная матрица рассчитывается для каждого класса, и после по формуле представленной ниже расчитывается общая матрица рассеивания.</p>
-                    <div class="formula">
-                        S<sub>W</sub> = S<sub>W<sub>i</sub></sub> + S<sub>W<sub>i</sub></sub> 
-                    </div>
-                    <p>В результате получается матрица размерностью n на n.</p>
-                    <div class="calculation-result">
-                        <p>S<sub>W</sub> = [[0.85, 0.55],<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0.55, 0.90]]</p>
-                    </div>
-                </div>
-
-                <div class="calculation-step">
-                    <h3>Шаг 3: Межклассовая матрица рассеяния</h3>
-                    <p>Данная матрица рассчитывается относительно средних значений классов. Она показывает насколько классы хорошо разделены между собой.</p>
-                    <div class="formula">
-                        S<sub>B</sub> = Σ(μ<sub>1</sub> - μ<sub>2</sub>)(μ<sub>1</sub> - μ<sub>2</sub>)<sup>T</sup>
-                    </div>
-                    <p>В результате получается матрица размерностью n на n.</p>
-                    <div class="calculation-result">
-                        <p>S<sub>W</sub> = [[1.85, 2.55],<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[2.55, 3.90]]</p>
-                    </div>
-                </div>
-                <!-- Шаг 3 -->
-                <div class="calculation-step">
-                    <h3>Шаг 4: Собственные векторы</h3>
-                    <p>Данный шаг является последним в расчете. Его результат дает коэффициенты альфа и бета, а также коэффициента смещения модели.</p>
-                    <div class="formula">
-                        S<sub>W</sub><sup>-1</sup>S<sub>B</sub>w = λw
-                    </div>
-                    <p>Результаты которые получены будут являться основными параметрами модели, на основе которых будет производиться предикт модели. Пример представлен ниже.</p>
-                    <div class="calculation-result">
-                        <p>w = [0.894, 0.447]</p>
-                        <p>λ = 2.34</p>
-                    </div>
-                </div>
-
-                <div class="calculation-step">
-                    <h3>Шаг 5: Получение предикта</h3>
-                    <p>Шаг является заключительным, предикт вычисляется относительно формулы расстояний центроиды Махаланобиса, которая показывает насколько близко элемент лежит к центроидам.</p>
-                    <div class="formula">
-                        D<sub>M</sub>(x,μ) = (x - μ)<sup>T</sup>S<sup>-1</sup>*(x - μ) 
-                        Predict = argmax(D<sub>M</sub>)
-                        <p>После расчета расстояний результат будет содержать n количество расстояний, максимальное из которых будет предиктом.</p>
-                    </div>
-                    <p>В качестве примера ниже представлен результат получения предикта, где входными данными являются признаки X</p>
-                    <div class="calculation-result">
-                        <p>D<sub>M</sub> = [1.231, 2.91]</p>
-                        <p>2 класс, поскольку 2.91 > 1.231</p>
-                    </div>
-                </div>
+            <h4>Описание:</h4>
+            <p>Запрос возвращает параметры модели, которые были получены в результате обучения модели.</p>
+            <h4>Входные данные: Отсутствуют</h4>
+            <h4>Выходные данные:</h4>
+            <div class="json-container">
+                <pre>
+    <code>{
+            {
+                <span class="json-key">"accuracy"</span>: <span class="json-number">88.9090</span>,
+                <span class="json-key">"x"</span>: [
+                    <span class="json-number">169.75</span>,
+                    <span class="json-number">88.71</span>,
+                    <span class="json-number">100.37</span>,
+                    <span class="json-number">106.32</span>,
+                    <span class="json-number">64.97</span>
+                    ]
+                <span class="json-key">"y"</span>: [
+                    <span class="json-number">5.76</span>,
+                    <span class="json-number">6.01</span>,
+                    <span class="json-number">12.3</span>,
+                    <span class="json-number">-0.21</span>,
+                    <span class="json-number">13.42</span>
+                ]
+                <span class="json-key">"linear_disc"</span>: [
+                [
+                    <span class="json-number">-0.0000026113213849359968</span>,
+                    <span class="json-number">9.071092035463008e-7</span>,
+                    <span class="json-number">-0.9730589500328451</span>,
+                    <span class="json-number">0.23055645675915357</span>
+                ],
+                [
+                    <span class="json-number">-5.621573593795121e-8</span>,
+                    <span class="json-number">-3.3960549064804125e-7</span>,
+                    <span class="json-number">0.9999835938050501</span>,
+                    <span class="json-number">0.005728186503452722</span>
+                ]
+            }
+    }</code>
+                </pre>
             </div>
-
-            <!-- Результат -->
-            <div class="result-section">
-                <div class="description-block">
-                    <h2>Результат LDA</h2>
-                    <div class="text-explanation">
-                        <p>Алгоритм определил:</p>
-                        <ul>
-                            <li>Оптимальную разделяющую гиперплоскость</li>
-                            <li>Направление максимальной разделимости классов</li>
-                            <li>Проекцию данных на новое пространство</li>
-                        </ul>
-                    </div>
+            <div class="code-example">
+                <div class="code-header">
+                    <span>Пример запроса на JavaScript</span>
+                    <button class="copy-button" onclick="copyCode(this)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                            <path d="M19 21H8V7h11m0-2H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2m-3-4H4a2 2 0 0 0-2 2v14h2V3h12V1z" 
+                                  fill="#b8f2e6"/>
+                        </svg>
+                    </button>
                 </div>
-                <div class="visualization-block">
-                    <div class="plot-container">
-                        <div class="axis x-axis"></div>
-                        <div class="axis y-axis"></div>
-                        <div class="hyperplane" 
-                        style="transform: rotate(-15deg); 
-                        top: 90%; 
-                        left: 20%"></div>
-                        
-                        <div class="data-point" style="left:10%;top:20%" data-class="1"></div>
-                        <div class="data-point" style="left:15%;top:25%" data-class="1"></div>
-                        <div class="data-point" style="left:20%;top:30%" data-class="1"></div>
-                        <div class="data-point" style="left:25%;top:35%" data-class="1"></div>
-                        <div class="data-point" style="left:30%;top:40%" data-class="1"></div>
-                        <div class="data-point" style="left:35%;top:45%" data-class="1"></div>
-                        <div class="data-point" style="left:40%;top:50%" data-class="1"></div>
-
-                        <div class="data-point" style="left:60%;top:55%" data-class="2"></div>
-                        <div class="data-point" style="left:65%;top:60%" data-class="2"></div>
-                        <div class="data-point" style="left:70%;top:65%" data-class="2"></div>
-                        <div class="data-point" style="left:75%;top:70%" data-class="2"></div>
-                        <div class="data-point" style="left:80%;top:75%" data-class="2"></div>
-                        <div class="data-point" style="left:85%;top:80%" data-class="2"></div>
-                        <div class="data-point" style="left:90%;top:85%" data-class="2"></div>
-                    </div>
-                </div>
-                <div class="description-block" style="margin-top: 2.5%;">
-                    <h2>Пояснение</h2>
-                    <div class="text-explanation">
-                        <p>Для данного примера, на простых не прикладных данных, было получено одномерное пространство, которое при проецирование на него точек будет идеально разделять классы.</p>
-                    </div>
-                </div>
+<pre><code class="language-javascript">fetch('http://localhost:8000/getParamModel')
+.then(response => response.json())
+.then(data => {
+    console.log(data.accuracy);
+    console.log(data.linear_disc);
+    console.log(data.x);
+    console.log(data.y);
+})
+.catch(error => {
+    console.error('Ошибка загрузки данных:', error);
+});</code></pre>
             </div>
         </div>
+        </div>
+
+        <!-- Пример документации для POST /predict -->
+        <div class="endpoint-card">
+            <div class="endpoint-header">
+                <h2 class="gradient-text">/predict</h2>
+                <span class="method-post">POST</span>
+            </div>
+            
+            <h4>Описание:</h4>
+            <p>Запрос передает параметры, которые ввел пользователь и возвращает предсказание от модели, к какому классу можно отнести введенные даныне. </p>
+            
+            <h4>Входные данные:</h4>
+            <div class="json-container">
+                <pre>
+    <code>{
+        <span class="json-key">"loan_term"</span>: <span class="json-number">12</span>,
+        <span class="json-key">"income_annum"</span>: <span class="json-number">9600000</span>,
+        <span class="json-key">"loan_amount"</span>: <span class="json-number">29900000</span>,
+        <span class="json-key">"cibil_score"</span>: <span class="json-number">778</span>
+    }</code>
+                </pre>
+            </div>
+
+            <h4>Выходные данные:</h4>
+            <div class="json-container">
+                <pre>
+    <code>{
+        <span class="json-key">"predict_model"</span>: <span class="json-number">0</span>,
+        <span class="json-key">"score_discrimination"</span>: [
+            [<span class="json-number">5.681426627284771</span>],
+            [<span class="json-number">3.157074353020393</span>]
+        ],
+        <span class="json-key">"data"</span>: [
+            [<span class="json-number">88.80298108018181</span>, <span class="json-number">-2.759730789719024</span>]
+        ]
+    }</code>
+                </pre>
+            </div>
+            <div class="code-example">
+                <div class="code-header">
+                    <span>Пример запроса на JavaScript</span>
+                    <button class="copy-button" onclick="copyCode(this)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                            <path d="M19 21H8V7h11m0-2H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2m-3-4H4a2 2 0 0 0-2 2v14h2V3h12V1z" 
+                                  fill="#b8f2e6"/>
+                        </svg>
+                    </button>
+                </div>
+<pre><code class="language-javascript">fetch('http://localhost:8000/predict', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+        loan_term: 12,
+        income_annum: 9600000,
+        loan_amount: 29900000,
+        cibil_score: 778
+    })
+})
+.then(response => response.json())
+.then(data => {
+    console.log('Result:', data);
+    // Обработка результата
+    if(data.predict_model === 0) {
+        alert('Кредит отклонён');
+    } else {
+        alert('Кредит одобрен');
+    }
+})
+.catch(error => {
+    console.error('Error:', error);
+});</code></pre>
+            </div>
+        </div>
+
+        <!-- Добавьте другие эндпоинты по аналогии -->
     </section>
 
+    <div id="copyNotification" class="copy-notification">
+        <span>✅ Код скопирован в буфер обмена!</span>
+    </div>
     <footer>
         <div class="container">
             <div class="footer-logo">LoanAI</div>
@@ -237,5 +470,7 @@
     </footer>
 
     <script src="js/scriptsIndex.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-json.min.js"></script>
 </body>
 </html>

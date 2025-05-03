@@ -9,7 +9,6 @@
         /* Дополнительные стили для страницы "Обо мне" */
         .about-section {
             padding: 80px 0;
-            background: radial-gradient(circle at 50% 100%, #1a1a2e 0%, #0d0d1a 100%);
         }
 
         .developer-card {
@@ -25,7 +24,7 @@
 
         .developer-header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 2%;
         }
 
         .developer-name {
@@ -85,7 +84,7 @@
     /* Заголовки */
     h1, h2, h3 {
         font-weight: 600;
-        margin: 1.5em 0 0.8em;
+        margin: 0.8em 0 1.0em;
     }
 
     h2 {
@@ -99,19 +98,19 @@
     }
 
     /* Списки */
-    ul {
+    .about-section ul {
         margin: 1.5em 0;
         padding-left: 30px;
         list-style: none;
     }
 
-    li {
+    .about-section li {
         margin: 0.8em 0;
         position: relative;
         padding-left: 25px;
     }
 
-    li::before {
+    .about-section li::before {
         content: '▹';
         position: absolute;
         left: 0;
@@ -254,7 +253,7 @@
                 <nav>
                     <ul>
                         <li><a href="index.html">Главная</a></li>
-                        <li><a href="aboutLDA.html">О LDA</a></li>
+                        <li><a href="aboutLDA.html">Endpoints</a></li>
                         <li><a href="demo.html">Демо</a></li>
                         <li><a href="about.html">О проекте</a></li>
                     </ul>
